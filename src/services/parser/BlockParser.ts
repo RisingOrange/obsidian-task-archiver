@@ -49,11 +49,18 @@ export class BlockParser {
         // TODO: this needs to be 1 only because the root block is 0, but this way this knowledge is implicit
         const [indentation] = splitOnIndentation(line);
         const levelsOfIndentation = 1;
-        if (this.settings.useTab) {
-            return levelsOfIndentation + indentation.length;
+
+        let effectiveWidth = 0;
+        for (const ch of indentation) {
+            if (ch === "\t") {
+                effectiveWidth += this.settings.tabSize;
+            } else {
+                effectiveWidth++;
+            }
         }
+
         return (
-            levelsOfIndentation + Math.ceil(indentation.length / this.settings.tabSize)
+            levelsOfIndentation + Math.ceil(effectiveWidth / this.settings.tabSize)
         );
     }
 

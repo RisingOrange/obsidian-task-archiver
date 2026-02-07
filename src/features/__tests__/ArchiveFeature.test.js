@@ -1293,6 +1293,34 @@ describe("Archive only if subtasks are done", () => {
         );
     });
 
+    test("Handles space-indented nested tasks correctly when useTab is true", async () => {
+        await archiveTasksAndCheckActiveFile(
+            [
+                "- [x] parent",
+                "    - [x] child 1",
+                "        - [x] grandchild",
+                "    - [x] child 2",
+                "# Archived",
+                "",
+            ],
+            [
+                "# Archived",
+                "",
+                "- [x] parent",
+                "\t- [x] child 1",
+                "\t\t- [x] grandchild",
+                "\t- [x] child 2",
+                "",
+            ],
+            {
+                settings: {
+                    ...DEFAULT_SETTINGS_FOR_TESTS,
+                    archiveOnlyIfSubtasksAreDone: true,
+                },
+            }
+        );
+    });
+
     test("Archives completed task if it has sub-items with bullets", async () => {
         await archiveTasksAndCheckActiveFile(
             ["- [x] foo", "\t- bar", "\t- [x] baz", "# Archived", ""],

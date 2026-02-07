@@ -171,6 +171,26 @@ describe("List items", () => {
         expect(nestedListItem.children.length).toBe(1);
     });
 
+    test("Multiple list items on different levels with spaces and useTab: true", () => {
+        const lines = [
+            "- 1",
+            "    - 1a",
+            "        - 1a1",
+            "            - 1a1a",
+            "    - 1b",
+        ];
+
+        const doc = new SectionParser(
+            new BlockParser({
+                useTab: true,
+                tabSize: 4,
+            })
+        ).parse(lines);
+        expect(doc.blockContent.children.length).toBe(1);
+        const item1 = doc.blockContent.children[0];
+        expect(item1.children.length).toBe(2); // "1a" and "1b" should be siblings
+    });
+
     test("Handles misaligned lists", () => {
         const lines = ["- l", "  - text"];
 
@@ -236,6 +256,25 @@ describe("Stringification", () => {
         const parsed = new SectionParser(new BlockParser(settings)).parse(lines);
         const stringified = parsed.stringify(buildIndentation(settings));
         expect(stringified).toEqual(lines);
+    });
+
+    test("Round-tripping with space-indented content and useTab: true converts to tabs correctly", () => {
+        const lines = [
+            "- 1",
+            "    - 1a",
+            "        - 1a1",
+            "    - 1b",
+        ];
+
+        const settings = { useTab: true, tabSize: 4 };
+        const parsed = new SectionParser(new BlockParser(settings)).parse(lines);
+        const stringified = parsed.stringify(buildIndentation(settings));
+        expect(stringified).toEqual([
+            "- 1",
+            "\t- 1a",
+            "\t\t- 1a1",
+            "\t- 1b",
+        ]);
     });
 
     test("Round-tripping does not mess up code blocks", () => {
