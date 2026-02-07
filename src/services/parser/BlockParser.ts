@@ -50,17 +50,18 @@ export class BlockParser {
         const [indentation] = splitOnIndentation(line);
         const levelsOfIndentation = 1;
 
-        let effectiveWidth = 0;
+        let column = 0;
         for (const ch of indentation) {
             if (ch === "\t") {
-                effectiveWidth += this.settings.tabSize;
+                // Advance to the next tab stop
+                column = Math.ceil((column + 1) / this.settings.tabSize) * this.settings.tabSize;
             } else {
-                effectiveWidth++;
+                column++;
             }
         }
 
         return (
-            levelsOfIndentation + Math.ceil(effectiveWidth / this.settings.tabSize)
+            levelsOfIndentation + Math.ceil(column / this.settings.tabSize)
         );
     }
 
