@@ -4,6 +4,9 @@ module.exports = {
         "<rootDir>/node_modules/(?!escape-string-regexp).+\\.js$",
     ],
     preset: "solid-jest/preset/browser",
+    moduleNameMapper: {
+        "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
+    },
     setupFilesAfterEnv: ["<rootDir>/support/jest-setup.ts"],
     testPathIgnorePatterns: ["test-util/"],
     testEnvironment: "jsdom",
