@@ -191,6 +191,40 @@ describe("List items", () => {
         expect(item1.children.length).toBe(2); // "1a" and "1b" should be siblings
     });
 
+    test("Mixed spaces and tabs uses tab-stop semantics", () => {
+        const parser = new BlockParser({ useTab: true, tabSize: 4 });
+
+        // "  \t" = 2 spaces + tab to next stop = column 4 = 1 indent level
+        expect(parser.getIndentationLevel("  \t- item")).toBe(2);
+        // "\t" = tab to column 4 = 1 indent level
+        expect(parser.getIndentationLevel("\t- item")).toBe(2);
+        // "   \t" = 3 spaces + tab to column 4 = 1 indent level (same as plain tab)
+        expect(parser.getIndentationLevel("   \t- item")).toBe(2);
+        // "\t\t" = tab to 4, tab to 8 = 2 indent levels
+        expect(parser.getIndentationLevel("\t\t- item")).toBe(3);
+        // "    \t" = 4 spaces (already at tab stop) + tab to column 8 = 2 indent levels
+        expect(parser.getIndentationLevel("    \t- item")).toBe(3);
+    });
+
+    test("Tab-indented input with useTab: false parses levels correctly", () => {
+        const lines = [
+            "- 1",
+            "\t- 1a",
+            "\t\t- 1a1",
+            "\t- 1b",
+        ];
+
+        const doc = new SectionParser(
+            new BlockParser({
+                useTab: false,
+                tabSize: 4,
+            })
+        ).parse(lines);
+        expect(doc.blockContent.children.length).toBe(1);
+        const item1 = doc.blockContent.children[0];
+        expect(item1.children.length).toBe(2); // "1a" and "1b" should be siblings
+    });
+
     test("Handles misaligned lists", () => {
         const lines = ["- l", "  - text"];
 
